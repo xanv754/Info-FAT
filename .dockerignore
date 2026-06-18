@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+dist/
+build/
+
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Logs y datos locales (se montan como volumen)
+logs/
+data/
+tmp/
+
+# Dev/IDE
+.env
+.env.*
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Docs
+NOTES.md
