@@ -1,0 +1,61 @@
+.tableWrapper {
+  overflow-x: "auto";
+  border-radius: "8px";
+  box-shadow: "0 1px 3px rgba(0,0,0,0.12)";
+  background-color: "#ffffff";
+}
+.table {
+  width: "100%";
+  border-collapse: "collapse";
+  font-size: "0.875rem";
+  min-width: "1000px";
+}
+.th {
+  background-color: "#1e3a5f";
+  color: "#e2e8f0";
+  padding: "0.75rem 1rem";
+  text-align: "left";
+  font-weight: 600;
+  white-space: "nowrap";
+  border-bottom: "2px solid #0f172a";
+}
+.filterRow {
+  background-color: "#f8fafc";
+}
+.filterTh {
+  padding: "0.4rem 0.5rem";
+  border-bottom: "1px solid #e2e8f0";
+}
+.filterInput {
+  width: "100%";
+  padding: "0.3rem 0.5rem";
+  border: "1px solid #cbd5e1";
+  border-radius: "4px";
+  font-size: "0.8rem";
+  color: "#0f172a";
+  background-color: "#ffffff";
+  box-sizing: "border-box";
+  outline: "none";
+}
+.td {
+  padding: "0.65rem 1rem";
+  border-bottom: "1px solid #e2e8f0";
+  white-space: "nowrap";
+  color: "#1e293b";
+}
+.rowEven {
+  background-color: "#ffffff";
+}
+.rowOdd {
+  background-color: "#f8fafc";
+}
+.nullCell {
+  color: "#94a3b8";
+  font-style: "italic";
+}
+.emptyCell {
+  padding: "2rem";
+  text-align: "center";
+  color: "#64748b";
+  font-size: "0.875rem";
+}

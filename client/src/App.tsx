@@ -500,7 +500,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#94a3b8",
   },
   main: {
-    maxWidth: "1400px",
+    maxWidth: "1800px",
     margin: "0 auto",
     padding: "1.5rem",
   },
