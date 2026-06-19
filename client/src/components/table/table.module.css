@@ -1,3 +1,9 @@
+.toolbar {
+  display: "flex";
+  justify-content: "space-between";
+  align-items: "center";
+  margin-bottom: "1rem";
+}
 .tableWrapper {
   overflow-x: "auto";
   border-radius: "8px";
