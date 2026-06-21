@@ -105,7 +105,7 @@ docker exec -it info_fat python -m infofat updater database --asf <path> --olt <
 ```bash
 docker exec -it info_fat python -m infofat updater database \
   --asf /data/asf.txt \
-  --olt /data/relacion_olt.txt
+  --olt /data/relacion_olt.xlsx
 ```
 
 ---
@@ -128,6 +128,6 @@ docker exec -it info_fat python -m infofat report fat --asf <path> --olt <path> 
 ```bash
 docker exec -it info_fat python -m infofat report fat \
   --asf /data/asf.txt \
-  --olt /data/relacion_olt.txt \
+  --olt /data/relacion_olt.xlsx \
   --dir /data/output/
 ```
