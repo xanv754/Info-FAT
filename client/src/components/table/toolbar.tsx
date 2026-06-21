@@ -1,18 +1,33 @@
-import type { Table } from "@tanstack/react-table";
-import type { FatRecord } from "../../models/fat";
 import styles from "./toolbar.module.css";
 
 interface ToolbarProps {
-  table: Table<FatRecord>;
-  totalData: number;
+  count: number;
+  from: number;
+  to: number;
+  total: number;
+  hasFilter: boolean;
+  loading: boolean;
 }
 
-export default function ToolbarComponent({ table, totalData }: ToolbarProps) {
-  return (
-    <div className={styles.toolbar}>
-      <span className={styles.recordCount}>
-        {table.getFilteredRowModel().rows.length} de {totalData} registros
-      </span>
-    </div>
-  );
+export default function ToolbarComponent({
+  count,
+  from,
+  to,
+  total,
+  hasFilter,
+  loading,
+}: ToolbarProps) {
+  let label: string;
+
+  if (loading && count === 0) {
+    label = "Cargando registros...";
+  } else if (total === 0) {
+    label = "Sin registros";
+  } else if (hasFilter) {
+    label = `${count} registros encontrados`;
+  } else {
+    label = `${from}–${to} de ${total} registros`;
+  }
+
+  return <span className={styles.recordCount}>{label}</span>;
 }

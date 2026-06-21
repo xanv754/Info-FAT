@@ -12,3 +12,9 @@ export interface FatRecord {
   port: number;
   acronym: string;
 }
+
+export interface FatInfo {
+  items: FatRecord[],
+  total_items: number,
+  total: number
+}

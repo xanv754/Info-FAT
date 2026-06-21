@@ -1,67 +1,103 @@
+.section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 1rem;
+}
 .toolbar {
-  display: "flex";
-  justify-content: "space-between";
-  align-items: "center";
-  margin-bottom: "1rem";
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 .tableWrapper {
-  overflow-x: "auto";
-  border-radius: "8px";
-  box-shadow: "0 1px 3px rgba(0,0,0,0.12)";
-  background-color: "#ffffff";
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  background-color: #ffffff;
 }
 .table {
-  width: "100%";
-  border-collapse: "collapse";
-  font-size: "0.875rem";
-  min-width: "1000px";
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
 }
 .th {
-  background-color: "#1e3a5f";
-  color: "#e2e8f0";
-  padding: "0.75rem 1rem";
-  text-align: "left";
+  background-color: #1e3a5f;
+  color: #e2e8f0;
+  padding: 0.75rem 1rem;
+  text-align: left;
   font-weight: 600;
-  white-space: "nowrap";
-  border-bottom: "2px solid #0f172a";
+  border-bottom: 2px solid #0f172a;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 .filterRow {
-  background-color: "#f8fafc";
+  background-color: #f8fafc;
 }
 .filterTh {
-  padding: "0.4rem 0.5rem";
-  border-bottom: "1px solid #e2e8f0";
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 2.75rem;
+  z-index: 1;
+  background-color: #f8fafc;
+}
+.filterTh:last-child {
+  padding-right: 1.25rem;
 }
 .filterInput {
-  width: "100%";
-  padding: "0.3rem 0.5rem";
-  border: "1px solid #cbd5e1";
-  border-radius: "4px";
-  font-size: "0.8rem";
-  color: "#0f172a";
-  background-color: "#ffffff";
-  box-sizing: "border-box";
-  outline: "none";
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  outline: none;
 }
 .td {
-  padding: "0.65rem 1rem";
-  border-bottom: "1px solid #e2e8f0";
-  white-space: "nowrap";
-  color: "#1e293b";
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
 }
 .rowEven {
-  background-color: "#ffffff";
+  background-color: #ffffff;
 }
 .rowOdd {
-  background-color: "#f8fafc";
+  background-color: #f8fafc;
 }
 .nullCell {
-  color: "#94a3b8";
-  font-style: "italic";
+  color: #94a3b8;
+  font-style: italic;
 }
 .emptyCell {
-  padding: "2rem";
-  text-align: "center";
-  color: "#64748b";
-  font-size: "0.875rem";
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+@media (max-width: 768px) {
+  .table {
+    min-width: 900px;
+  }
+  .th {
+    white-space: nowrap;
+  }
+  .td {
+    white-space: nowrap;
+  }
 }

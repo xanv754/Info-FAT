@@ -2,205 +2,150 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
-  type ColumnFiltersState,
-  type FilterFn,
 } from "@tanstack/react-table";
-import { useState, useCallback } from "react";
-import type { FatRecord } from "../../models/fat";
+import { useState } from "react";
+import * as XLSX from "xlsx";
+import type { FatRecord, FatInfo } from "../../models/fat";
+import type { FilterEntry } from "../../hooks/useFilteredFat";
 import styles from "./table.module.css";
 import ToolbarComponent from "./toolbar";
 import DownloadButtonComponent from "../button/download";
+import PaginationComponent from "./pagination";
 
 const columnHelper = createColumnHelper<FatRecord>();
 
-const fuzzyFilter: FilterFn<FatRecord> = (row, columnId, filterValue) => {
-  const value = row.getValue(columnId);
-  if (value === null || value === undefined) return false;
-  return String(value)
-    .toLowerCase()
-    .includes(String(filterValue).toLowerCase());
-};
-
 const COLUMNS = [
-  columnHelper.accessor("id", {
-    header: "ID",
-    filterFn: "includesString",
-  }),
-  columnHelper.accessor("serial", {
-    header: "Serial",
-    filterFn: fuzzyFilter,
-  }),
+  columnHelper.accessor("id", { header: "ID" }),
+  columnHelper.accessor("serial", { header: "Serial" }),
   columnHelper.accessor("fat", {
     header: "FAT",
-    filterFn: fuzzyFilter,
     cell: (info) =>
       info.getValue() ?? <span className={styles.nullCell}>—</span>,
   }),
-  columnHelper.accessor("state", {
-    header: "Estado",
-    filterFn: fuzzyFilter,
-  }),
-  columnHelper.accessor("region", {
-    header: "Región",
-    filterFn: fuzzyFilter,
-  }),
-  columnHelper.accessor("municipality", {
-    header: "Municipio",
-    filterFn: fuzzyFilter,
-  }),
-  columnHelper.accessor("parish", {
-    header: "Parroquia",
-    filterFn: fuzzyFilter,
-  }),
-  columnHelper.accessor("ip", {
-    header: "IP",
-    filterFn: fuzzyFilter,
-  }),
+  columnHelper.accessor("state", { header: "Estado" }),
+  columnHelper.accessor("region", { header: "Región" }),
+  columnHelper.accessor("municipality", { header: "Municipio" }),
+  columnHelper.accessor("parish", { header: "Parroquia" }),
+  columnHelper.accessor("ip", { header: "IP" }),
   columnHelper.accessor("address", {
     header: "Dirección",
-    filterFn: fuzzyFilter,
     cell: (info) =>
       info.getValue() ?? <span className={styles.nullCell}>—</span>,
   }),
-  columnHelper.accessor("card", {
-    header: "Card",
-    filterFn: "includesString",
-  }),
-  columnHelper.accessor("port", {
-    header: "Puerto",
-    filterFn: "includesString",
-  }),
-  columnHelper.accessor("acronym", {
-    header: "Acrónimo",
-    filterFn: fuzzyFilter,
-  }),
+  columnHelper.accessor("card", { header: "Card" }),
+  columnHelper.accessor("port", { header: "Puerto" }),
+  columnHelper.accessor("acronym", { header: "Acrónimo" }),
 ];
 
-function ColumnFilter({
-  value,
-  onChange,
-  type = "text",
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  type?: "text" | "number";
-}) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder="Filtrar..."
-      className={styles.filterInput}
-    />
-  );
-}
+// id no tiene equivalente en el backend, no es filtrable server-side
+const FILTERABLE_COLUMNS = new Set([
+  "serial", "fat", "state", "region", "municipality",
+  "parish", "ip", "address", "card", "port", "acronym",
+]);
 
-function exportToCSV(rows: FatRecord[], filename: string) {
-  const headers = [
-    "id",
-    "serial",
-    "fat",
-    "state",
-    "region",
-    "municipality",
-    "parish",
-    "ip",
-    "address",
-    "card",
-    "port",
-    "acronym",
+const XLSX_HEADERS = ["ID", "Serial", "FAT", "Estado", "Región", "Municipio", "Parroquia", "IP", "Dirección", "Card", "Puerto", "Acrónimo"];
+const XLSX_KEYS: (keyof FatRecord)[] = ["id", "serial", "fat", "state", "region", "municipality", "parish", "ip", "address", "card", "port", "acronym"];
+
+function exportToXLSX(rows: FatRecord[], filename: string) {
+  const sheetData = [
+    XLSX_HEADERS,
+    ...rows.map((r) => XLSX_KEYS.map((k) => r[k] ?? "")),
   ];
-
-  const escape = (v: string | number | null) => {
-    if (v === null || v === undefined) return "";
-    const s = String(v);
-    return s.includes(",") || s.includes('"') || s.includes("\n")
-      ? `"${s.replace(/"/g, '""')}"`
-      : s;
-  };
-
-  const csvContent = [
-    headers.join(","),
-    ...rows.map((r) =>
-      headers
-        .map((h) => escape(r[h as keyof FatRecord] as string | number | null))
-        .join(","),
-    ),
-  ].join("\n");
-
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "FAT");
+  XLSX.writeFile(wb, filename);
 }
 
 interface TableProps {
   fats: FatRecord[];
+  total: number;
+  page: number;
+  pageSize: number;
+  filters: FilterEntry[];
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  onFilterChange: (column: string, value: string) => void;
+  loading?: boolean;
 }
 
-export default function TableComponent({ fats }: TableProps) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+export default function TableComponent({
+  fats,
+  total,
+  page,
+  pageSize,
+  filters,
+  onPageChange,
+  onPageSizeChange,
+  onFilterChange,
+  loading = false,
+}: TableProps) {
+  const [downloading, setDownloading] = useState(false);
 
   const table = useReactTable({
-    data: fats, //TODO: Importar data obtenida
+    data: fats,
     columns: COLUMNS,
-    state: { columnFilters },
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const getFilterValue = useCallback(
-    (columnId: string) => {
-      const f = columnFilters.find((f) => f.id === columnId);
-      return f ? String(f.value) : "";
-    },
-    [columnFilters],
-  );
+  const rows = table.getCoreRowModel().rows;
+  const hasFilter = filters.length > 0;
+  const from = total > 0 ? page * pageSize + 1 : 0;
+  const to = page * pageSize + fats.length;
 
-  const setFilterValue = useCallback((columnId: string, value: string) => {
-    setColumnFilters((prev) => {
-      const rest = prev.filter((f) => f.id !== columnId);
-      return value === "" ? rest : [...rest, { id: columnId, value }];
-    });
-  }, []);
+  const getFilterValue = (columnId: string) =>
+    filters.find((f) => f.column === columnId)?.value ?? "";
 
-  const numericColumns = new Set(["id", "card", "port"]);
+  const isDownloadDisabled = (hasFilter && fats.length === 0) || total === 0;
 
-  const handleDownload = () => {
-    const filteredRows = table
-      .getFilteredRowModel()
-      .rows.map((r) => r.original);
-    const hasFilters = columnFilters.length > 0;
-    exportToCSV(
-      filteredRows,
-      hasFilters ? "fat_filtrado.csv" : "fat_completo.csv",
-    );
+  const handleDownload = async () => {
+    if (hasFilter) {
+      exportToXLSX(fats, "fat_filtrado.xlsx");
+      return;
+    }
+
+    setDownloading(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const params = new URLSearchParams({ ge: "0", le: String(total) });
+      const res = await fetch(`${apiUrl}/?${params}`);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const json = (await res.json()) as FatInfo;
+      exportToXLSX(json.items, "fat_completo.xlsx");
+    } catch (err) {
+      console.error("Error al descargar datos:", err);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
-    <section>
+    <section className={styles.section}>
       <div className={styles.toolbar}>
-        <ToolbarComponent table={table} totalData={fats.length} />
-        <DownloadButtonComponent handlerDownload={handleDownload} />
+        <ToolbarComponent
+          count={fats.length}
+          from={from}
+          to={to}
+          total={total}
+          hasFilter={hasFilter}
+          loading={loading}
+        />
+        <DownloadButtonComponent
+          handlerDownload={handleDownload}
+          disabled={isDownloadDisabled}
+          loading={downloading}
+        />
       </div>
-      <div className={styles.tableWrapper}>
+
+      <div className={`${styles.tableWrapper}${loading ? ` ${styles.loading}` : ""}`}>
         <table className={styles.table}>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th key={header.id} className={styles.th}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
+                    {flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 ))}
               </tr>
@@ -210,13 +155,15 @@ export default function TableComponent({ fats }: TableProps) {
               <tr key={`filter-${headerGroup.id}`} className={styles.filterRow}>
                 {headerGroup.headers.map((header) => (
                   <th key={`filter-${header.id}`} className={styles.filterTh}>
-                    <ColumnFilter
-                      value={getFilterValue(header.column.id)}
-                      onChange={(v) => setFilterValue(header.column.id, v)}
-                      type={
-                        numericColumns.has(header.column.id) ? "number" : "text"
-                      }
-                    />
+                    {FILTERABLE_COLUMNS.has(header.column.id) ? (
+                      <input
+                        type="text"
+                        value={getFilterValue(header.column.id)}
+                        onChange={(e) => onFilterChange(header.column.id, e.target.value)}
+                        placeholder="Filtrar..."
+                        className={styles.filterInput}
+                      />
+                    ) : null}
                   </th>
                 ))}
               </tr>
@@ -224,35 +171,34 @@ export default function TableComponent({ fats }: TableProps) {
           </thead>
 
           <tbody>
-            {table.getFilteredRowModel().rows.length === 0 ? (
+            {loading && fats.length === 0 ? (
+              <tr>
+                <td colSpan={COLUMNS.length} className={styles.emptyCell}>
+                  Cargando registros...
+                </td>
+              </tr>
+            ) : rows.length === 0 ? (
               <tr>
                 <td colSpan={COLUMNS.length} className={styles.emptyCell}>
                   No hay registros que coincidan con los filtros aplicados.
                 </td>
               </tr>
             ) : (
-              table.getFilteredRowModel().rows.map((row, i) => (
+              rows.map((row, i) => (
                 <tr
                   key={row.id}
                   className={i % 2 === 0 ? styles.rowEven : styles.rowOdd}
                   onMouseEnter={(e) => {
-                    (
-                      e.currentTarget as HTMLTableRowElement
-                    ).style.backgroundColor = "#e0f2fe";
+                    (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "#e0f2fe";
                   }}
                   onMouseLeave={(e) => {
-                    (
-                      e.currentTarget as HTMLTableRowElement
-                    ).style.backgroundColor =
+                    (e.currentTarget as HTMLTableRowElement).style.backgroundColor =
                       i % 2 === 0 ? "#ffffff" : "#f8fafc";
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className={styles.td}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
                 </tr>
@@ -261,6 +207,16 @@ export default function TableComponent({ fats }: TableProps) {
           </tbody>
         </table>
       </div>
+
+      {!hasFilter && (
+        <PaginationComponent
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      )}
     </section>
   );
 }

@@ -1,156 +1,53 @@
+import { useState } from "react";
 import styles from "./styles.module.css";
-import type { FatRecord } from "./models/fat";
 import HeaderComponent from "./components/header/header";
 import TableComponent from "./components/table/table";
-
-const MOCK_DATA: FatRecord[] = [
-  {
-    id: 1,
-    serial: "HWTC8A2B1F03",
-    fat: "FAT-CCS-001",
-    state: "Distrito Capital",
-    region: "Capital",
-    municipality: "Libertador",
-    parish: "El Recreo",
-    ip: "192.168.10.1",
-    address: "Av. Urdaneta, Edif. Centro Simón Bolívar",
-    card: 1,
-    port: 4,
-    acronym: "CCS",
-  },
-  {
-    id: 2,
-    serial: "ZTEG7B19D40A",
-    fat: "FAT-MCY-014",
-    state: "Aragua",
-    region: "Central",
-    municipality: "Girardot",
-    parish: "Las Delicias",
-    ip: "10.0.5.22",
-    address: "Calle Bermúdez, Local 3",
-    card: 2,
-    port: 8,
-    acronym: "MCY",
-  },
-  {
-    id: 3,
-    serial: "HWTC9C3E2210",
-    fat: null,
-    state: "Zulia",
-    region: "Occidental",
-    municipality: "Maracaibo",
-    parish: "Olegario Villalobos",
-    ip: "172.16.0.45",
-    address: null,
-    card: 1,
-    port: 2,
-    acronym: "MAR",
-  },
-  {
-    id: 4,
-    serial: "FBHN1A88E7C2",
-    fat: "FAT-VLN-007",
-    state: "Carabobo",
-    region: "Central",
-    municipality: "Valencia",
-    parish: "San José",
-    ip: "10.1.3.100",
-    address: "Urb. Prebo, Av. Bolívar Norte",
-    card: 3,
-    port: 1,
-    acronym: "VLN",
-  },
-  {
-    id: 5,
-    serial: "ZTEG6F2A9C11",
-    fat: "FAT-BRQ-021",
-    state: "Lara",
-    region: "Centroccidental",
-    municipality: "Iribarren",
-    parish: "Catedral",
-    ip: "192.168.50.8",
-    address: "Cra. 19 con Calle 21",
-    card: 2,
-    port: 6,
-    acronym: "BRQ",
-  },
-  {
-    id: 6,
-    serial: "HWTC4D55B019",
-    fat: "FAT-PZO-003",
-    state: "Bolívar",
-    region: "Guayana",
-    municipality: "Caroní",
-    parish: "Cachamay",
-    ip: "10.20.1.77",
-    address: null,
-    card: 4,
-    port: 3,
-    acronym: "PZO",
-  },
-  {
-    id: 7,
-    serial: "FBHN2E71C803",
-    fat: null,
-    state: "Mérida",
-    region: "Los Andes",
-    municipality: "Libertador",
-    parish: "El Sagrario",
-    ip: "172.20.0.12",
-    address: "Av. 3 Los Próceres, Torre A",
-    card: 1,
-    port: 7,
-    acronym: "MRD",
-  },
-  {
-    id: 8,
-    serial: "ZTEG8A40F2D7",
-    fat: "FAT-MAT-012",
-    state: "Anzoátegui",
-    region: "Oriental",
-    municipality: "Sotillo",
-    parish: "Pozuelos",
-    ip: "10.5.8.200",
-    address: "Sector La Llanada, Galpón 7",
-    card: 2,
-    port: 9,
-    acronym: "MAT",
-  },
-  {
-    id: 9,
-    serial: "HWTC7B12A6E0",
-    fat: "FAT-CUM-005",
-    state: "Sucre",
-    region: "Oriental",
-    municipality: "Sucre",
-    parish: "Altagracia",
-    ip: "192.168.100.3",
-    address: "Calle Mariño, frente a Plaza Bolívar",
-    card: 3,
-    port: 5,
-    acronym: "CUM",
-  },
-  {
-    id: 10,
-    serial: "FBHN3C90D154",
-    fat: "FAT-SCS-019",
-    state: "Táchira",
-    region: "Los Andes",
-    municipality: "San Cristóbal",
-    parish: "Pedro María Morantes",
-    ip: "10.10.2.55",
-    address: null,
-    card: 1,
-    port: 1,
-    acronym: "SCS",
-  },
-];
+import { useFat } from "./hooks/useFat";
+import { useFilteredFat, type FilterEntry } from "./hooks/useFilteredFat";
 
 export default function FatMonitor() {
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(50);
+  const [filters, setFilters] = useState<FilterEntry[]>([]);
+
+  const { data: paginatedData, loading: paginatedLoading, error: paginatedError } = useFat(page, pageSize);
+  const { data: filteredData, loading: filteredLoading, error: filteredError } = useFilteredFat(filters);
+
+  const hasFilter = filters.length > 0;
+  const data = hasFilter ? filteredData : paginatedData;
+  const loading = hasFilter ? filteredLoading : paginatedLoading;
+  const error = hasFilter ? filteredError : paginatedError;
+
+  const handleFilterChange = (column: string, value: string) => {
+    setFilters((prev) => {
+      const rest = prev.filter((f) => f.column !== column);
+      if (value === "") return rest;
+      return [...rest, { column, value }];
+    });
+    setPage(0);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(0);
+  };
+
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <main className={styles.page}>
       <HeaderComponent />
-      <TableComponent fats={MOCK_DATA} />
+      <TableComponent
+        fats={data?.items ?? []}
+        total={data?.total ?? 0}
+        page={page}
+        pageSize={pageSize}
+        filters={filters}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+        onFilterChange={handleFilterChange}
+        loading={loading}
+      />
     </main>
   );
 }
