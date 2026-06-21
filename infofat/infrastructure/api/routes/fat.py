@@ -50,7 +50,7 @@ def get_fats_filter(
     if len(name_columns) != len(values):
         raise HTTPException(
             status_code=400,
-            detail="'name_column' y 'value' deben tener el mismo número de elementos",
+            detail="'name_column' and 'value' must have the same length of elements",
         )
 
     valid_columns = DataColumns.lists()
