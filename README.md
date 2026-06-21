@@ -72,6 +72,62 @@ docker compose up -d
 ```
 
 ## Backend CLI
+
+All commands are run inside the backend container:
+
 ```bash
-docker exec -it info_fat python -m infofat --help
+docker exec -it info_fat python -m infofat [COMMAND] [OPTIONS]
+```
+
+The CLI is organised into two command groups:
+
+| Group      | Description                               |
+| ---------- | ----------------------------------------- |
+| `updater`  | Commands to update all system information |
+| `report`   | Commands for report output                |
+
+---
+
+### `updater database`
+
+Updates the system database file by processing the source data files.
+
+```bash
+docker exec -it info_fat python -m infofat updater database --asf <path> --olt <path>
+```
+
+| Option  | Required | Description                   |
+| ------- | -------- | ----------------------------- |
+| `--asf` | Yes      | Path to the ASF file          |
+| `--olt` | Yes      | Path to the RELACION_OLT file |
+
+**Example:**
+```bash
+docker exec -it info_fat python -m infofat updater database \
+  --asf /data/asf.txt \
+  --olt /data/relacion_olt.txt
+```
+
+---
+
+### `report fat`
+
+Generates and exports a report with FAT information derived from the source data files.
+
+```bash
+docker exec -it info_fat python -m infofat report fat --asf <path> --olt <path> [--dir <path>]
+```
+
+| Option  | Required | Description                              |
+| ------- | -------- | ---------------------------------------- |
+| `--asf` | Yes      | Path to the ASF file                     |
+| `--olt` | Yes      | Path to the RELACION_OLT file            |
+| `--dir` | No       | Output directory for the exported report |
+
+**Example:**
+```bash
+docker exec -it info_fat python -m infofat report fat \
+  --asf /data/asf.txt \
+  --olt /data/relacion_olt.txt \
+  --dir /data/output/
 ```
