@@ -33,7 +33,7 @@ const COLUMNS = [
     cell: (info) =>
       info.getValue() ?? <span className={styles.nullCell}>—</span>,
   }),
-  columnHelper.accessor("card", { header: "Card" }),
+  columnHelper.accessor("card", { header: "Tarjeta" }),
   columnHelper.accessor("port", { header: "Puerto" }),
   columnHelper.accessor("acronym", { header: "Acrónimo" }),
 ];
