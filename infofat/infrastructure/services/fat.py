@@ -42,7 +42,7 @@ class FatService:
 
     @staticmethod
     def get_filter_column(
-        name_column: list[str], value: list[str]
+        name_column: list[str], value: list[str], ge: int = 1, le: int = 500
     ) -> tuple[list[FatDTO], int, int]:
         database_path = str(
             (
@@ -69,6 +69,13 @@ class FatService:
                 mask &= df[col].astype(str) == val
 
         df = df[mask]
+        df = df.reset_index()
+
+        if ge < 0 or le > total or le < ge:
+            raise ValueError("Index out of range")
+
+        total_df = len(df)
+        df = df[ge:le]
 
         json = FatMapper.to_model(df)
-        return json, len(df), total
+        return json, total_df, total

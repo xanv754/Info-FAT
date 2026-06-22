@@ -26,7 +26,11 @@ interface UseFilteredFatResult {
   error: string | null;
 }
 
-export function useFilteredFat(filters: FilterEntry[]): UseFilteredFatResult {
+export function useFilteredFat(
+  filters: FilterEntry[],
+  page: number,
+  pageSize: number,
+): UseFilteredFatResult {
   const [data, setData] = useState<FatInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,13 +62,17 @@ export function useFilteredFat(filters: FilterEntry[]): UseFilteredFatResult {
 
     const timer = setTimeout(() => {
       const apiUrl = import.meta.env.VITE_API_URL;
-      const params = new URLSearchParams();
+      const ge = page * pageSize;
+      const le = ge + pageSize;
+
+      const params = new URLSearchParams({ ge: String(ge), le: String(le) });
       mapped.forEach((m) => params.append("name_columns", m.name));
       mapped.forEach((m) => params.append("values", m.value));
 
       fetch(`${apiUrl}/filter?${params}`)
         .then((res) => {
-          if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+          if (!res.ok)
+            throw new Error(`Error ${res.status}: ${res.statusText}`);
           return res.json() as Promise<FatInfo>;
         })
         .then((json) => setData(json))
@@ -73,7 +81,7 @@ export function useFilteredFat(filters: FilterEntry[]): UseFilteredFatResult {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [filtersKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [filtersKey, page, pageSize]);
 
   return { data, loading, error };
 }

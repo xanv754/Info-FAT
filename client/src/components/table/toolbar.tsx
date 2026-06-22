@@ -5,7 +5,6 @@ interface ToolbarProps {
   from: number;
   to: number;
   total: number;
-  hasFilter: boolean;
   loading: boolean;
 }
 
@@ -14,7 +13,6 @@ export default function ToolbarComponent({
   from,
   to,
   total,
-  hasFilter,
   loading,
 }: ToolbarProps) {
   let label: string;
@@ -23,8 +21,6 @@ export default function ToolbarComponent({
     label = "Cargando registros...";
   } else if (total === 0) {
     label = "Sin registros";
-  } else if (hasFilter) {
-    label = `${count} registros encontrados`;
   } else {
     label = `${from}–${to} de ${total} registros`;
   }

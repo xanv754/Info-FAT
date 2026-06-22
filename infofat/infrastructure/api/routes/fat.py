@@ -19,7 +19,7 @@ def get_fats(
         le: End index.
     """
     if ge >= le:
-        raise HTTPException(status_code=400, detail="'ge' debe ser menor que 'le'")
+        raise HTTPException(status_code=400, detail="'ge' must be less than 'le'")
 
     try:
         items, total_items, total = FatService.get_interval(ge=ge, le=le)
@@ -37,6 +37,8 @@ def get_fats_filter(
     values: list[str] = Query(
         ..., description="List of values corresponding to each column"
     ),
+    ge: int = Query(default=0, ge=0, description="Start index"),
+    le: int = Query(default=500, gt=0, description="End index"),
 ):
     """Get filtered FAT data.
 
@@ -44,7 +46,12 @@ def get_fats_filter(
     ----------
         name_column: List of column names to filter by.
         value: List of values corresponding to each column.
+        ge: Start index.
+        le: End index.
     """
+    if ge >= le:
+        raise HTTPException(status_code=400, detail="'ge' must be less than 'le'")
+
     name_columns = [col.upper() for col in name_columns]
     values = [value.upper() for value in values]
     if len(name_columns) != len(values):
@@ -63,7 +70,7 @@ def get_fats_filter(
 
     try:
         items, total_items, total = FatService.get_filter_column(
-            name_column=name_columns, value=values
+            name_column=name_columns, value=values, ge=ge, le=le
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

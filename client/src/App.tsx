@@ -10,11 +10,23 @@ export default function FatMonitor() {
   const [pageSize, setPageSize] = useState(50);
   const [filters, setFilters] = useState<FilterEntry[]>([]);
 
-  const { data: paginatedData, loading: paginatedLoading, error: paginatedError } = useFat(page, pageSize);
-  const { data: filteredData, loading: filteredLoading, error: filteredError } = useFilteredFat(filters);
+  const {
+    data: paginatedData,
+    loading: paginatedLoading,
+    error: paginatedError,
+  } = useFat(page, pageSize);
+  const {
+    data: filteredData,
+    loading: filteredLoading,
+    error: filteredError,
+  } = useFilteredFat(filters, page, pageSize);
 
   const hasFilter = filters.length > 0;
+
   const data = hasFilter ? filteredData : paginatedData;
+  const total = hasFilter
+    ? (filteredData?.total_items ?? 0)
+    : (paginatedData?.total ?? 0);
   const loading = hasFilter ? filteredLoading : paginatedLoading;
   const error = hasFilter ? filteredError : paginatedError;
 
@@ -39,7 +51,7 @@ export default function FatMonitor() {
       <HeaderComponent />
       <TableComponent
         fats={data?.items ?? []}
-        total={data?.total ?? 0}
+        total={total ?? 0}
         page={page}
         pageSize={pageSize}
         filters={filters}

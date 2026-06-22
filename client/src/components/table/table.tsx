@@ -38,14 +38,48 @@ const COLUMNS = [
   columnHelper.accessor("acronym", { header: "Acrónimo" }),
 ];
 
-// id no tiene equivalente en el backend, no es filtrable server-side
 const FILTERABLE_COLUMNS = new Set([
-  "serial", "fat", "state", "region", "municipality",
-  "parish", "ip", "address", "card", "port", "acronym",
+  "serial",
+  "fat",
+  "state",
+  "region",
+  "municipality",
+  "parish",
+  "ip",
+  "address",
+  "card",
+  "port",
+  "acronym",
 ]);
 
-const XLSX_HEADERS = ["ID", "Serial", "FAT", "Estado", "Región", "Municipio", "Parroquia", "IP", "Dirección", "Card", "Puerto", "Acrónimo"];
-const XLSX_KEYS: (keyof FatRecord)[] = ["id", "serial", "fat", "state", "region", "municipality", "parish", "ip", "address", "card", "port", "acronym"];
+const XLSX_HEADERS = [
+  "ID",
+  "Serial",
+  "FAT",
+  "Estado",
+  "Región",
+  "Municipio",
+  "Parroquia",
+  "IP",
+  "Dirección",
+  "Card",
+  "Puerto",
+  "Acrónimo",
+];
+const XLSX_KEYS: (keyof FatRecord)[] = [
+  "id",
+  "serial",
+  "fat",
+  "state",
+  "region",
+  "municipality",
+  "parish",
+  "ip",
+  "address",
+  "card",
+  "port",
+  "acronym",
+];
 
 function exportToXLSX(rows: FatRecord[], filename: string) {
   const sheetData = [
@@ -128,7 +162,6 @@ export default function TableComponent({
           from={from}
           to={to}
           total={total}
-          hasFilter={hasFilter}
           loading={loading}
         />
         <DownloadButtonComponent
@@ -138,14 +171,19 @@ export default function TableComponent({
         />
       </div>
 
-      <div className={`${styles.tableWrapper}${loading ? ` ${styles.loading}` : ""}`}>
+      <div
+        className={`${styles.tableWrapper}${loading ? ` ${styles.loading}` : ""}`}
+      >
         <table className={styles.table}>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th key={header.id} className={styles.th}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
                   </th>
                 ))}
               </tr>
@@ -159,7 +197,9 @@ export default function TableComponent({
                       <input
                         type="text"
                         value={getFilterValue(header.column.id)}
-                        onChange={(e) => onFilterChange(header.column.id, e.target.value)}
+                        onChange={(e) =>
+                          onFilterChange(header.column.id, e.target.value)
+                        }
                         placeholder="Filtrar..."
                         className={styles.filterInput}
                       />
@@ -189,16 +229,23 @@ export default function TableComponent({
                   key={row.id}
                   className={i % 2 === 0 ? styles.rowEven : styles.rowOdd}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "#e0f2fe";
+                    (
+                      e.currentTarget as HTMLTableRowElement
+                    ).style.backgroundColor = "#e0f2fe";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLTableRowElement).style.backgroundColor =
+                    (
+                      e.currentTarget as HTMLTableRowElement
+                    ).style.backgroundColor =
                       i % 2 === 0 ? "#ffffff" : "#f8fafc";
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className={styles.td}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -208,15 +255,13 @@ export default function TableComponent({
         </table>
       </div>
 
-      {!hasFilter && (
-        <PaginationComponent
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-        />
-      )}
+      <PaginationComponent
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </section>
   );
 }
