@@ -26,7 +26,7 @@ ifndef REMOTE_HOST
 	$(error REMOTE_HOST no definido. Uso: make deploy REMOTE_USER=usuario REMOTE_HOST=ip REMOTE_PATH=/ruta)
 endif
 	$(MAKE) pack
-	scp $(IMAGES_FILE) $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)
+	scp $(IMAGES_FILE) docker-compose.yml $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)
 	rm -f $(IMAGES_FILE)
 	@echo "Transferencia completada a $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)"
 
