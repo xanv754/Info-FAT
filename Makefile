@@ -15,7 +15,7 @@ delete:
 
 pack:
 	docker compose build
-	docker compose images -q | xargs docker save | gzip > $(IMAGES_FILE)
+	docker compose config --images | xargs docker save | gzip > $(IMAGES_FILE)
 	@echo "Imágenes comprimidas en $(IMAGES_FILE)"
 
 deploy:
