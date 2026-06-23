@@ -68,7 +68,7 @@ make deploy REMOTE_USER=ubuntu REMOTE_HOST=127.0.0.1 REMOTE_PATH=/opt/infofat/
 **Loading images on the remote server:**
 ```bash
 gunzip -c infofat-images.tar.gz | docker load
-docker compose up -d
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ## Backend CLI
