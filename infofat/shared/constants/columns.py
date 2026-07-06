@@ -1,7 +1,15 @@
 from enum import Enum
 
 
-class ASFColumn(str, Enum):
+class BaseColumn(str, Enum):
+    """Base enum providing a helper to list all column values."""
+
+    @classmethod
+    def columns(cls) -> list[str]:
+        return [col.value for col in cls]
+
+
+class ASFColumn(BaseColumn):
     SERIAL = "SERIAL_MODEM"
     FAT = "FAT"
     STATE = "ESTADO"
@@ -13,15 +21,14 @@ class ASFColumn(str, Enum):
     CARD = "SLOT"
     PORT = "PUERTO"
 
-    @classmethod
-    def columns(cls) -> list[str]:
-        return [col.value for col in cls]
+
+class ASFModColumn(BaseColumn):
+    ODN_GDA = "ODN_GDA"
+    ZONAS_GDA = "ZONAS_GDA"
+    HOSTNAME_OLT = "HOSTNAME_OLT"
+    STATUS_CRM = "STATUS_CRM"
 
 
-class OLTColumn(str, Enum):
+class OLTColumn(BaseColumn):
     IP = "IP"
     ACRONYM = "ACRONIMO"
-
-    @classmethod
-    def columns(cls) -> list[str]:
-        return [col.value for col in cls]
