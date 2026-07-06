@@ -10,6 +10,7 @@ A lightweight and efficient tool aimed at telecommunications and network support
   - [Local Operations](#local-operations)
   - [Deployment](#deployment)
 - [Backend CLI](#backend-cli)
+- [Development Mode](#development-mode)
 ---
 
 ## Features
@@ -130,4 +131,34 @@ docker exec -it info_fat python -m infofat report fat \
   --asf /data/asf.txt \
   --olt /data/relacion_olt.xlsx \
   --dir /data/output/
+```
+
+## Development Mode
+
+For local development, the backend and frontend are run directly on the host instead of through Docker.
+
+> **Note:** The frontend require their respective environment variable files (see [Environment Variables](#environment-variables)) to be present before starting.
+
+### Backend
+
+Activate the Python virtual environment first, then run:
+
+```bash
+py -m uvicorn infofat.infrastructure.api.app:app --reload --host 0.0.0.0 --port 8000
+```
+
+This starts the backend API with hot-reload enabled.
+
+To see the available CLI commands (still within the virtual environment):
+
+```bash
+py -m infofat --help
+```
+
+### Frontend
+
+From the `client` folder, install dependencies and start the dev server:
+
+```bash
+bun run dev
 ```
