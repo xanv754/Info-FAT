@@ -18,6 +18,9 @@ class FatDTO(BaseModel):
     card: int
     port: int
     acronym: str
+    odn_gda: str
+    zone_gda: str
+    status_crm: str
 
     @field_validator("fat", "address", mode="before")
     @classmethod

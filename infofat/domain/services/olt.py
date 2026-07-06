@@ -28,6 +28,7 @@ class OLTService(DataService):
 
             # Duplicates
             df = df.drop_duplicates()
+            df = df.reset_index()
 
             # Standard columns
             df[OLTColumn.IP.value] = df[OLTColumn.IP.value].astype(str)

@@ -1,6 +1,6 @@
 from pandas import DataFrame
 from infofat.infrastructure.dto import FatDTO
-from infofat.shared import ASFColumn, OLTColumn, FatMapperError
+from infofat.shared import ASFColumn, OLTColumn, ASFModColumn, FatMapperError
 
 
 class FatMapper:
@@ -25,6 +25,9 @@ class FatMapper:
                         card=info[ASFColumn.CARD.value],
                         port=info[ASFColumn.PORT.value],
                         acronym=info[OLTColumn.ACRONYM.value],
+                        odn_gda=info[ASFModColumn.ODN_GDA.value],
+                        zone_gda=info[ASFModColumn.ZONAS_GDA.value],
+                        status_crm=info[ASFModColumn.STATUS_CRM.value]
                     )
                 )
         except Exception as error:
