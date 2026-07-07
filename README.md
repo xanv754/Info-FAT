@@ -1,5 +1,11 @@
 # Info FAT
 
+<div align="center" height="500px">
+
+![frontend](./docs/page.png)
+
+</div>
+
 A lightweight and efficient tool aimed at telecommunications and network support engineers. The system processes massive text files containing OLT equipment configurations to extract, structure, and present FAT box information in an intuitive way.
 
 ## Table of Contents
@@ -109,6 +115,24 @@ docker exec -it info_fat python -m infofat updater database \
   --olt /data/relacion_olt.xlsx
 ```
 
+### `updater database with mod file`
+
+Updates the system database file by processing the source data files with a modification file.
+
+```bash
+docker exec -it info_fat python -m infofat updater mod-database --asf <path>
+```
+
+| Option  | Required | Description                   |
+| ------- | -------- | ----------------------------- |
+| `--asf` | Yes      | Path to the ASF MOD file      |
+
+**Example:**
+```bash
+docker exec -it info_fat python -m infofat updater mod-database \
+  --asf /data/asf.xlsx
+```
+
 ---
 
 ### `report fat`
@@ -144,7 +168,7 @@ For local development, the backend and frontend are run directly on the host ins
 Activate the Python virtual environment first, then run:
 
 ```bash
-py -m uvicorn infofat.infrastructure.api.app:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn infofat.infrastructure.api.app:app --reload --host 0.0.0.0 --port 8000
 ```
 
 This starts the backend API with hot-reload enabled.
@@ -152,7 +176,7 @@ This starts the backend API with hot-reload enabled.
 To see the available CLI commands (still within the virtual environment):
 
 ```bash
-py -m infofat --help
+python -m infofat --help
 ```
 
 ### Frontend
