@@ -1,13 +1,17 @@
 from pandas import DataFrame
-from infofat.shared import ASFColumn, ASFServiceError, ASFMissingColumns
+from infofat.shared import ASFColumn, ASFServiceError, ASFMissingColumns, ASFModColumn
 from infofat.domain.services.interface import DataService
 from infofat.domain.ports.data_reader import DataReader
+from infofat.shared.constants import OLTColumn
 
+EMPTY_VALUES = "SIN INFORMACIÓN"
 
 class ASFService(DataService):
+    _mod: bool
     _data: DataFrame
 
-    def __init__(self, reader: DataReader) -> None:
+    def __init__(self, reader: DataReader, mod: bool = False) -> None:
+        self._mod = mod
         data = reader.get_data()
         data = self._clean_data(data)
         self._data = data
@@ -19,15 +23,31 @@ class ASFService(DataService):
             data.columns = data.columns.str.upper().str.replace(" ", "_")
 
             # Necessary columns
-            necessary_col = ASFColumn.columns()
+            if self._mod:
+                necessary_col = ASFColumn.columns() + ASFModColumn.columns()
+            else:
+                necessary_col = ASFColumn.columns()
+
             data_col = data.columns.to_list()
             if not set(necessary_col).issubset(data_col):
                 missing_cols = list(set(necessary_col) - set(data_col))
                 raise ASFMissingColumns(missing_cols)
-            df = data[ASFColumn.columns()]
+            df = data[necessary_col]
 
             # Duplicates
             df = df.drop_duplicates()
+
+            # MOD columns
+            for col in ASFModColumn.columns():
+                if col not in df.columns:
+                    df[col] = EMPTY_VALUES
+                else:
+                    df[col] = df[col].astype(str)
+                    df[col] = df[col].str.upper()
+
+            df = df.reset_index()
+            df = df.fillna(EMPTY_VALUES)
+            df = df.rename(columns={ASFModColumn.HOSTNAME_OLT.value: OLTColumn.ACRONYM.value})
         except ASFMissingColumns:
             raise
         except Exception as error:

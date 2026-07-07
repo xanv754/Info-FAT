@@ -36,6 +36,9 @@ const COLUMNS = [
   columnHelper.accessor("card", { header: "Tarjeta" }),
   columnHelper.accessor("port", { header: "Puerto" }),
   columnHelper.accessor("acronym", { header: "Acrónimo" }),
+  columnHelper.accessor("odn_gda", { header: "ODN GDA" }),
+  columnHelper.accessor("zone_gda", { header: "ZONAS GDA" }),
+  columnHelper.accessor("status_crm", { header: "ESTATUS CRM" }),
 ];
 
 const FILTERABLE_COLUMNS = new Set([
@@ -50,6 +53,9 @@ const FILTERABLE_COLUMNS = new Set([
   "card",
   "port",
   "acronym",
+  "odn_gda",
+  "zone_gda",
+  "status_crm",
 ]);
 
 const XLSX_HEADERS = [
@@ -65,6 +71,9 @@ const XLSX_HEADERS = [
   "Card",
   "Puerto",
   "Acrónimo",
+  "ODN GDA",
+  "ZONAS GDA",
+  "ESTATUS CRM",
 ];
 const XLSX_KEYS: (keyof FatRecord)[] = [
   "id",
@@ -79,6 +88,9 @@ const XLSX_KEYS: (keyof FatRecord)[] = [
   "card",
   "port",
   "acronym",
+  "odn_gda",
+  "zone_gda",
+  "status_crm",
 ];
 
 function exportToXLSX(rows: FatRecord[], filename: string) {
