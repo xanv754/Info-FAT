@@ -25,9 +25,9 @@ class FatMapper:
                         card=info[ASFColumn.CARD.value],
                         port=info[ASFColumn.PORT.value],
                         acronym=info[OLTColumn.ACRONYM.value],
-                        odn_gda=info[ASFModColumn.ODN_GDA.value],
-                        zone_gda=info[ASFModColumn.ZONAS_GDA.value],
-                        status_crm=info[ASFModColumn.STATUS_CRM.value]
+                        odn_gda=str(info[ASFModColumn.ODN_GDA.value]),
+                        zone_gda=str(info[ASFModColumn.ZONAS_GDA.value]),
+                        status_crm=str(info[ASFModColumn.STATUS_CRM.value])
                     )
                 )
         except Exception as error:

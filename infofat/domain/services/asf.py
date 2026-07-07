@@ -4,6 +4,7 @@ from infofat.domain.services.interface import DataService
 from infofat.domain.ports.data_reader import DataReader
 from infofat.shared.constants import OLTColumn
 
+EMPTY_VALUES = "SIN INFORMACIÓN"
 
 class ASFService(DataService):
     _mod: bool
@@ -39,9 +40,13 @@ class ASFService(DataService):
             # MOD columns
             for col in ASFModColumn.columns():
                 if col not in df.columns:
-                    df[col] = "SIN INFORMACIÓN"
+                    df[col] = EMPTY_VALUES
+                else:
+                    df[col] = df[col].astype(str)
+                    df[col] = df[col].str.upper()
 
             df = df.reset_index()
+            df = df.fillna(EMPTY_VALUES)
             df = df.rename(columns={ASFModColumn.HOSTNAME_OLT.value: OLTColumn.ACRONYM.value})
         except ASFMissingColumns:
             raise
