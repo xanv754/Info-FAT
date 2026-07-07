@@ -15,6 +15,7 @@ A lightweight and efficient tool aimed at telecommunications and network support
 - [Makefile Reference](#makefile-reference)
   - [Local Operations](#local-operations)
   - [Deployment](#deployment)
+- [Expected File Columns](#expected-file-columns)
 - [Backend CLI](#backend-cli)
 - [Development Mode](#development-mode)
 ---
@@ -77,6 +78,49 @@ make deploy REMOTE_USER=ubuntu REMOTE_HOST=127.0.0.1 REMOTE_PATH=/opt/infofat/
 gunzip -c infofat-images.tar.gz | docker load
 docker-compose -f docker-compose.prod.yml up -d
 ```
+
+## Expected File Columns
+
+The files supplied to the [Backend CLI](#backend-cli) are validated against a fixed set of expected column names. Column names are matched case-insensitively and spaces are treated as underscores (e.g. `ip olt` and `IP_OLT` are equivalent), but the columns listed below must be present or the command will fail.
+
+### ASF
+
+The master file with the base information to display.
+
+| Column         |
+| -------------- |
+| `SERIAL_MODEM` |
+| `FAT`          |
+| `ESTADO`       |
+| `REGION`       |
+| `MUNICIPIO`    |
+| `PARROQUIA`    |
+| `IP_OLT`       |
+| `CQE`          |
+| `SLOT`         |
+| `PUERTO`       |
+
+### ASF MOD
+
+Identical to the ASF file, plus 4 additional columns.
+
+| Column         |
+| -------------- |
+| `ODN_GDA`      |
+| `ZONAS_GDA`    |
+| `HOSTNAME_OLT` |
+| `STATUS_CRM`   |
+
+### RELACION_OLT (OLT)
+
+Only the following columns are relevant from this file; any other column is ignored.
+
+| Column     |
+| ---------- |
+| `IP`       |
+| `ACRONIMO` |
+
+---
 
 ## Backend CLI
 
