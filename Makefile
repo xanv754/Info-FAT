@@ -14,8 +14,13 @@ delete:
 	docker compose down -v
 
 pack:
-	docker compose build
-	docker compose config --images | xargs docker save | gzip > $(IMAGES_FILE)
+	docker compose -f docker-compose.prod.yml build
+	docker compose -f docker-compose.prod.yml config --images | xargs docker save | gzip > $(IMAGES_FILE)
+	@echo "Imágenes comprimidas en $(IMAGES_FILE)"
+
+old-pack:
+	BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker compose -f docker-compose.prod.yml build
+	docker compose -f docker-compose.prod.yml config --images | xargs docker save | gzip > $(IMAGES_FILE)
 	@echo "Imágenes comprimidas en $(IMAGES_FILE)"
 
 deploy:
