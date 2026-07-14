@@ -1,6 +1,9 @@
 IMAGES_FILE = infofat-images.tar.gz
 REMOTE_PATH ?= ~/
 
+dev:
+	docker compose -f docker-compose.dev.yml up -d
+
 build:
 	docker compose build
 
@@ -35,4 +38,5 @@ endif
 	rm -f $(IMAGES_FILE)
 	@echo "Transferencia completada a $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)"
 
-.PHONY: build start stop delete pack deploy
+
+.PHONY: dev build start stop delete pack old-pack deploy
